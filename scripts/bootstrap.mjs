@@ -188,8 +188,10 @@ for (const e of ${JSON.stringify(HOOK_EVENTS)}) spawnSync('git', ['config', 'hoo
     writeFileSync(join(bin, 'npm'), `#!/bin/sh\n${log('npm')}\n[ -n "$STUB_NPM_FAILS" ] && exit 1\nmkdir -p node_modules\n`, { mode: 0o755 })
     writeFileSync(join(bin, 'bd'), `#!/bin/sh\n${log('bd')}\n[ -n "$STUB_BD_NOOP" ] && exit 0\nmkdir -p .beads/embeddeddolt\neval "\${STUB_BD:-:}"\n`, { mode: 0o755 })
     writeFileSync(join(bin, 'git'), `#!/bin/sh\n[ "$1" = --version ] && [ -n "$STUB_GIT_VERSION" ] && { echo "git version $STUB_GIT_VERSION"; exit 0; }\nexec "${realGit}" "$@"\n`, { mode: 0o755 })
+    // The doctor asks a login shell for node; the machine's own would find its node, not the pin (a CI runner's).
+    writeFileSync(join(bin, 'login-shell'), `#!/bin/sh\necho ${process.version}\n`, { mode: 0o755 })
     const environment = {
-      ...env(), PATH: [bin, dirname(process.execPath), '/usr/bin', '/bin'].join(delimiter),
+      ...env(), PATH: [bin, dirname(process.execPath), '/usr/bin', '/bin'].join(delimiter), SHELL: join(bin, 'login-shell'),
       GIT_CONFIG_GLOBAL: join(root, '.gitconfig'), GIT_CONFIG_SYSTEM: '/dev/null', STUB_LOG: join(bin, 'log'),
     }
     spawnSync('git', ['init', '--quiet', root], { env: environment })

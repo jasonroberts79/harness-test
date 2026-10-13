@@ -1,0 +1,6 @@
+agent.profile: "conservative"
+sync.remote: "https://github.com/jasonroberts79/harness-test.git"
+dolt:
+    auto-commit: "on"
+validation:
+    on-create: warn

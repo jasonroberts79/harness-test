@@ -1,0 +1,9 @@
+{
+  "describes": "The bounds on how a session works: how many fixes that each failed it makes against one failure before it stops and reports (`rootCauseMaxFixes`, which the `root-cause` skill reads).",
+  "whyThisFileExists": "A bound a prompt follows is a constant, and a constant a prompt reads lives in a policy file under a key, with its reason beside it (`AGENTS.md` § Three kinds of file, and never a fourth), so the skill cites the key and spells no number. It is a record of its own, apart from `policy/tool-settings.json`, because it bounds a session rather than a tool.",
+  "gatedBy": "mise run check:policy holds this record's header, a `Means` beside every constant, and no key another record also defines. No gate holds the value of `rootCauseMaxFixes`: a session reads it while it debugs, which no gate sees.",
+  "whatItDoesNOTDo": "It holds no rule about how a session finds a failure's cause, or what counts as a fix that failed, which `.harness/skills/root-cause/SKILL.md` says; it holds only how many such fixes a session makes.",
+  "provenance": "Came with the template this repository was bootstrapped from; each key's `Means` gives the reason for its value.",
+  "rootCauseMaxFixes": 3,
+  "rootCauseMaxFixesMeans": "How many fixes that each failed a session makes against one failure before it makes no further fix and reports to the user what it tested, as `.harness/skills/root-cause/SKILL.md` § 6 says, which also says what counts as a fix that failed: a run that fixes past it is guessing, and the design may be what is wrong, which is the user's call. The skill reads it by key and spells no number. 3 is the number obra/superpowers' `systematic-debugging` skill uses at 8ca22db, which nothing in this repository has measured. Where it loses: a failure with several independent causes, each fix right but partial, stops at the third fix and waits on a person, although the run was converging."
+}

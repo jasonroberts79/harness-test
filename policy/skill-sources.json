@@ -8,7 +8,119 @@
   "claudeEnabledPluginsMeans": "Each Claude Code plugin this repository enables, as `<plugin>@<marketplace>`, rendered into `.claude/settings.json` `enabledPlugins` and installed at project scope for each clone by `scripts/skill-sources.mjs sync`. Removing an entry uninstalls this clone's project record at the next sync. Each marketplace named must have a row in `claudePluginMarketplaces`.",
   "claudePluginMarketplaces": {},
   "claudePluginMarketplacesMeans": "Each plugin marketplace an enabled plugin comes from, keyed by its name as `claude plugin marketplace list` gives it. A row is `{\"source\": \"<owner>/<repo>#<tag>\", \"heldTo\": \"<mise tool>\" (optional), \"means\": \"<why>\"}`. The tag pins what the marketplace serves, and sync registers it as `https://github.com/<owner>/<repo>.git#<tag>`. `heldTo` names a `mise.toml` tool shipped from the same repository, whose pin the tag must equal, with or without a leading `v`, so the plugin and its CLI move together. Where it loses: an upstream fix reaches no machine until someone moves the tag by hand.",
-  "installedSkills": {},
+  "installedSkills": {
+    "code-review-and-quality": {
+      "source": "addyosmani/agent-skills",
+      "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+      "reason": "Gives a session a review of its own diff for correctness, readability, architecture, security and performance before the open-pr skill's adversarial-verifier, which no tracked skill does; adopted with conditions by docs/decisions/2026-10-14-addyosmani-agent-skills.md.",
+      "assessment": {
+        "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+        "rulesCommit": "c0c12ddf2a27078c9e4dea9662d9622ebb8ca838",
+        "findings": 9,
+        "issue": "harness-test-eby"
+      },
+      "audit": {
+        "agent-trust-hub": {
+          "status": "pass",
+          "riskLevel": "SAFE",
+          "auditedAt": "2026-10-02T04:45:25.652Z"
+        },
+        "socket": {
+          "status": "pass",
+          "auditedAt": "2026-10-02T04:45:40.759Z"
+        },
+        "snyk": {
+          "status": "warn",
+          "riskLevel": "MEDIUM",
+          "auditedAt": "2026-10-02T04:45:09.032182+00:00"
+        },
+        "runlayer": {
+          "status": "warn",
+          "riskLevel": "MEDIUM",
+          "auditedAt": "2026-02-22T23:48:07.073Z"
+        },
+        "zeroleaks": {
+          "status": "pass",
+          "riskLevel": "NONE",
+          "auditedAt": "2026-04-16T02:28:20.390Z"
+        }
+      }
+    },
+    "incremental-implementation": {
+      "source": "addyosmani/agent-skills",
+      "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+      "reason": "Builds a product change in small slices, each tested before the next, which no tracked skill does; it runs inside the work skill's worktree, as docs/decisions/2026-10-14-addyosmani-agent-skills.md conditions.",
+      "assessment": {
+        "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+        "rulesCommit": "c0c12ddf2a27078c9e4dea9662d9622ebb8ca838",
+        "findings": 8,
+        "issue": "harness-test-44g"
+      },
+      "audit": {
+        "agent-trust-hub": {
+          "status": "pass",
+          "riskLevel": "SAFE",
+          "auditedAt": "2026-09-15T05:23:39.562Z"
+        },
+        "socket": {
+          "status": "pass",
+          "auditedAt": "2026-09-15T05:24:01.962Z"
+        },
+        "snyk": {
+          "status": "pass",
+          "riskLevel": "LOW",
+          "auditedAt": "2026-09-15T05:23:28.707443+00:00"
+        },
+        "runlayer": {
+          "status": "warn",
+          "riskLevel": "MEDIUM",
+          "auditedAt": "2026-02-22T23:48:08.165Z"
+        },
+        "zeroleaks": {
+          "status": "pass",
+          "riskLevel": "NONE",
+          "auditedAt": "2026-04-16T02:52:14.614Z"
+        }
+      }
+    },
+    "test-driven-development": {
+      "source": "addyosmani/agent-skills",
+      "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+      "reason": "Application code will live here, and no tracked skill makes a session write a failing test before the code that passes it; adopted with conditions by docs/decisions/2026-10-14-addyosmani-agent-skills.md.",
+      "assessment": {
+        "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+        "rulesCommit": "c0c12ddf2a27078c9e4dea9662d9622ebb8ca838",
+        "findings": 5,
+        "issue": "harness-test-k7x"
+      },
+      "audit": {
+        "agent-trust-hub": {
+          "status": "pass",
+          "riskLevel": "SAFE",
+          "auditedAt": "2026-10-14T07:23:17.943Z"
+        },
+        "socket": {
+          "status": "pass",
+          "auditedAt": "2026-10-14T07:19:58.432Z"
+        },
+        "snyk": {
+          "status": "pass",
+          "riskLevel": "LOW",
+          "auditedAt": "2026-10-14T07:19:25.919777+00:00"
+        },
+        "runlayer": {
+          "status": "warn",
+          "riskLevel": "MEDIUM",
+          "auditedAt": "2026-02-22T23:48:08.497Z"
+        },
+        "zeroleaks": {
+          "status": "pass",
+          "riskLevel": "NONE",
+          "auditedAt": "2026-04-16T13:08:19.685Z"
+        }
+      }
+    }
+  },
   "installedSkillsMeans": "Each skill the `skills` CLI installs into `.claude/skills/<name>/`, keyed by the skill's name. A row is `{\"source\": \"<owner>/<repo>\", \"commit\": \"<40-hex sha>\", \"reason\": \"<why this repository wants it>\", \"assessment\": {\"commit\": \"<the sha it read>\", \"rulesCommit\": \"<the sha of AGENTS.md and CLAUDE.md it judged against>\", \"findings\": <count>, \"issue\": \"<tracker id, when findings or the audit was not all pass>\"}, \"audit\": {\"<provider slug>\": {\"status\": \"pass|warn|fail\", \"riskLevel\": \"<level>\", \"auditedAt\": \"<time>\"}}}`. `audit` is the skills.sh result the operator accepted; a sync holds the skill when a provider's result is worse at `fail`, HIGH or CRITICAL, and warns below that. The commit pins the text, since without one the CLI downloads from Vercel's server unchecked. Rows are added only by the `add-skill` skill's admission steps.",
   "skillAssessorMaxFindings": 10,
   "skillAssessorMaxFindingsMeans": "The most findings the `skill-assessor` agent reports for one skill, ranked most severe first. A finding past this is not reported, so the operator reads a list short enough to decide on. 10 is unmeasured: it is the order of the rubric's six kinds of conflict with room for two of the commonest. Where it loses: a skill with more real conflicts than this shows only the first ten, and the eleventh waits for the next pin move.",

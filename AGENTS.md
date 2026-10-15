@@ -5,6 +5,7 @@ definitions, or the header of the tool or gate that enforces it. Change it there
 A rule with two homes has one that is stale.
 The one exception is outside text, loaded word for word: a plugin or an installed skill that
 `policy/skill-sources.json` names, which only the `add-skill` skill's checks admit.
+Where such text and a tracked file disagree, the tracked file wins.
 
 ## Memory tiers
 

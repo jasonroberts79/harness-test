@@ -562,7 +562,8 @@ rmSync(hostSide, { recursive: true, force: true })
 const unseenRegistered = (name) => existsSync(join(unseenPrimary, '.git', 'worktrees', name))
 
 // The hook works on the checkout it sits in, so a copy sits in the scratch one, run with no GIT_* key:
-// under a real push an inherited GIT_DIR would point its git at this repository.
+// an inherited GIT_DIR, which the hook runner drops but another caller may not, would point its git
+// at this repository.
 const unseenHook = join(unseenPrimary, 'scripts', 'hooks', 'worktree-remove.mjs')
 mkdirSync(dirname(unseenHook), { recursive: true })
 copyFileSync(REMOVE, unseenHook)
@@ -687,8 +688,9 @@ function render(template) {
   const worktree = join(root, 'a&b')
   mkdirSync(worktree)
   mkdirSync(join(root, 'cwd'))
-  // GIT_ENV, because the renderer runs `git worktree list` to spare its siblings' ports, and under a
-  // real push an inherited GIT_DIR would point that at this repository.
+  // GIT_ENV, because the renderer runs `git worktree list` to spare its siblings' ports, and an
+  // inherited GIT_DIR, which the hook runner drops but another caller may not, would point that at
+  // this repository.
   const r = spawnSync('node', [copy, worktree, HOSTILE.BRANCH, HOSTILE.BASE_SHA, HOSTILE.TASK_REF], {
     cwd: join(root, 'cwd'),
     env: GIT_ENV,

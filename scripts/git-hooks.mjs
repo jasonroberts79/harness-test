@@ -36,6 +36,13 @@
  * The wrong fix weighed first was lefthook, hardened. If this runner were
  * wrong, a glob it misread would stop a gate on exactly the pushes that change its inputs, and a
  * skip it did not print would read as a pass; `--selftest` holds both.
+ * A job gets no `GIT_DIR`. From a linked worktree, `git push` and `mise run gates` hand the hook
+ * that worktree's git directory, and `GIT_DIR` outranks a git command's directory. On 2026-10-14
+ * and 2026-10-15, `integrations:selftest` ran `git init <scratch dir>` under it, which
+ * re-initialised this repository and set `core.bare = true` in the config every checkout shares.
+ * Before then each selftest dropped `GIT_*` itself, with `tools/lib/git-env.ts` or a copy of it,
+ * and that one call did not. A job runs at the checkout's top, so git still finds the repository.
+ * `GIT_INDEX_FILE` stays, because pre-commit needs the index that `git commit -a` names.
  *
  * WHAT IT NEVER BLOCKS. `git worktree add` runs post-checkout in the new worktree and fails when it
  * fails, and a new worktree has no `node_modules` until `npm ci`. So at prepare-commit-msg,
@@ -436,9 +443,10 @@ function runJob(job, command) {
   return new Promise((done) => {
     const started = performance.now()
     const chunks = []
+    const { GIT_DIR: _, ...inherited } = process.env
     const child = spawn(command, {
       cwd: ROOT,
-      env: { ...process.env, ...job.env },
+      env: { ...inherited, ...job.env },
       shell: true,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: process.platform !== 'win32',
@@ -922,7 +930,7 @@ for (let i = 0; i < rest.length; i++) {
   else if (rest[i] === '--sleep') sleep = Number(rest[++i])
   else args.push(rest[i])
 }
-appendFileSync('ran.log', JSON.stringify({ name, args, force: process.env.GIT_HOOKS_FORCE ?? null, mark: process.env.FIXTURE_MARK ?? null }) + '\\n')
+appendFileSync('ran.log', JSON.stringify({ name, args, force: process.env.GIT_HOOKS_FORCE ?? null, mark: process.env.FIXTURE_MARK ?? null, gitDir: process.env.GIT_DIR ?? null, index: process.env.GIT_INDEX_FILE ?? null }) + '\\n')
 if (print) process.stdout.write('BEGIN\\n' + 'x'.repeat(print) + '\\nEND\\n')
 if (sleep) {
   writeFileSync(name + '.pid', String(process.pid))
@@ -1183,7 +1191,14 @@ async function gitCases(base, env, record) {
     const pushed = g(wt, ['push', '-u', 'origin', 'wtb'])
     expect(pushed.status === 0, both(pushed))
     expect(ran(wt).some((job) => job.name === 'only-in-worktree'), `the worktree's job file was not read: ${both(pushed)}`)
-    return "the worktree's runner ran"
+    const leaked = ran(wt).filter((job) => job.gitDir !== null)
+    expect(leaked.length === 0, `a job got the push's GIT_DIR, so its git would answer for this repository: ${JSON.stringify(leaked)}`)
+    writeFileSync(join(wt, 'docs.md'), 'y\n')
+    clear(wt)
+    ok(wt, ['commit', '-q', '-a', '-m', 'all'])
+    const staged = ran(wt).find((job) => job.name === 'md-only')
+    expect(staged && /worktrees[/\\]wt[/\\]index\.lock$/.test(staged.index ?? ''), `pre-commit did not get the index \`git commit -a\` names, so it would check what was staged before: ${JSON.stringify(staged)}`)
+    return "the worktree's runner ran, no job got GIT_DIR, and pre-commit got commit -a's index"
   })
 
   await check('the install writes the five entries, removes a lefthook shim, leaves a backup, and warns of the tracker\'s hook', () => {

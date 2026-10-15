@@ -562,8 +562,9 @@ console.log('citation scanner selftest\n')
         mkdirSync(dirname(join(dir, path)), { recursive: true })
         writeFileSync(join(dir, path), text)
       }
-      // Without any GIT_* key: inside a pre-push hook git exports GIT_DIR, which outranks `cwd`, and
-      // the gate would list THIS repository's files while claiming to read the tree.
+      // Without any GIT_* key: an inherited GIT_DIR, which the hook runner drops but another caller
+      // may not, outranks `cwd`, and the gate would list THIS repository's files while claiming to
+      // read the tree.
       const env = gitEnv()
       execFileSync('git', ['init', '-q'], { cwd: dir, env, stdio: 'ignore' })
       execFileSync('git', ['add', '-A'], { cwd: dir, env, stdio: 'ignore' })

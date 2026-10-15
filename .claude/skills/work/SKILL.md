@@ -65,6 +65,13 @@ session proposed itself.
 
 ## 4. Implement, regenerate, gate
 
+Implement with the installed skills `test-driven-development`, `incremental-implementation` and
+`code-review-and-quality`, since descriptions alone may not fire them. They claim no issue, and
+commit only in this worktree, because no guard holds the primary checkout's `main`. What they would
+ask is filed below, since a question stalls an autonomous run. Their example commands are not this
+repository's: run `tasks.toml` tasks, ending at `mise run gates`, then the `verify` workflow. Gate
+work keeps `AGENTS.md` § Standing rules for prompts and gates.
+
 Stage every file the change adds (`git add`) before the gates run: a new file not yet added passes
 the citations gate unread. Run `mise run gates`, the build check here.  
 Run no task name `tasks.toml` does not list. 

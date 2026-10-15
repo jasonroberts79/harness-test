@@ -88,6 +88,7 @@ pre-push:
         - 'tools/integrations/**'
         - 'policy/skill-sources.json'
         - 'tools/lib/policy.ts'
+        - 'tools/lib/git-env.ts'
         - 'scripts/render-integrations.mjs'
         - 'scripts/hooks/**'
         - 'scripts/new-worktree.sh'
